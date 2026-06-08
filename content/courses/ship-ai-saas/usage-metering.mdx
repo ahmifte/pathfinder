@@ -1,0 +1,21 @@
+## Enforcing per-plan usage limits
+
+Usage metering is what turns a free toy into a business. The pattern is simple
+and lives entirely on the server.
+
+### The model
+
+One row per user per billing period (`YYYY-MM`) with a count. Before every
+billable action, read the count, compare it to the plan's limit, and reject with
+a clear upgrade prompt if it is exceeded.
+
+### Incrementing safely
+
+Use an atomic upsert with `increment` so concurrent requests can't race past the
+limit. Only increment after the action succeeds, so a failed AI call doesn't burn
+a user's quota.
+
+### Why this matters
+
+Limits create the upgrade pressure that drives revenue, and they protect you from
+runaway API costs. Get this right and the rest of the business model follows.

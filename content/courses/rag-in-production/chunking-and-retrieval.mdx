@@ -1,0 +1,21 @@
+## Chunking and retrieval that works
+
+Retrieval quality is mostly decided before a query ever runs — at chunking time.
+
+### Chunking
+
+Split on semantic boundaries (headings, paragraphs), keep chunks in the
+200–500 token range, and add a small overlap so context isn't severed
+mid-thought. Attach metadata (source, section) to every chunk for filtering and
+citation.
+
+### Retrieval
+
+Embed the query, fetch the top-k chunks, and — when precision matters — rerank
+them. Always pass the source metadata through so the model can cite where an
+answer came from.
+
+### Practical tip
+
+Log the retrieved chunks for real queries. Most "the model is dumb" complaints
+are actually "the right chunk was never retrieved."

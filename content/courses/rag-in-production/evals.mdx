@@ -1,0 +1,21 @@
+## Evaluating answer quality
+
+If you can't measure it, you can't improve it. Evals turn RAG from guesswork into
+engineering.
+
+### Build a golden set
+
+Collect 20–50 real questions with known-good answers. This is your regression
+suite — small enough to maintain, large enough to catch breakage.
+
+### Score what matters
+
+- **Faithfulness** — is the answer supported by the retrieved context?
+- **Relevance** — does it actually answer the question?
+- **Retrieval hit rate** — was the needed chunk retrieved at all?
+
+### Close the loop
+
+Run the evals on every change to prompts, chunking, or models. Ship only when the
+numbers hold or improve. This discipline is the difference between a demo and a
+product.

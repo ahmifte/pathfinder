@@ -1,0 +1,21 @@
+## Wiring auth and billing
+
+Authentication and billing are tightly linked: a user's plan lives on their
+account, and Stripe webhooks keep that plan in sync.
+
+### Auth
+
+We use NextAuth with the Prisma adapter and database sessions. The session
+callback exposes `session.user.id`, which every protected route relies on.
+
+### Billing
+
+Checkout creates a Stripe Customer keyed to the user, then a Checkout Session in
+`subscription` mode. The real source of truth is the webhook: on
+`checkout.session.completed` and `customer.subscription.updated`, we write the
+plan back to the user record.
+
+### The golden rule
+
+Never trust the client for entitlement. The plan a user has is whatever the
+webhook last wrote to the database — never what the browser claims.
