@@ -6,15 +6,6 @@
 
 A self-hostable, open-source **course platform** with Stripe one-time payments, gated MDX lessons, and per-lesson progress tracking. Keep ~97% of revenue instead of handing half to a marketplace.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ahmifte/pathfinder)
-
-## Why this project?
-
-Course marketplaces take a huge cut and own your audience. pathfinder is the
-self-hosted alternative: you own the platform, the customer relationship, and the
-margin. It is production-ready and easy to extend — a new course is a registry
-entry plus a few MDX files.
-
 ## Features
 
 - Course catalog with free intro lessons as the funnel
