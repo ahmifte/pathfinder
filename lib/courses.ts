@@ -1,8 +1,8 @@
-import { env } from "@/lib/env";
-
 // Courses are defined in code and their lesson bodies live as MDX files in
 // content/courses/<courseId>/<lessonSlug>.mdx. Adding a course = adding an entry
-// here plus the matching MDX files. Stripe price IDs come from the environment.
+// here plus the matching MDX files. Each course defines its price by amount + a
+// stable `lookupKey`; the Stripe price object is provisioned by
+// `pnpm stripe:sync` and resolved at runtime via lib/stripe-prices.ts.
 
 export type Lesson = {
   slug: string;
@@ -16,7 +16,9 @@ export type Course = {
   title: string;
   description: string;
   priceLabel: string;
-  stripePriceId?: string;
+  lookupKey: string;
+  amount: number; // one-time charge in the currency's smallest unit (cents)
+  currency: string;
   lessons: Lesson[];
 };
 
@@ -27,7 +29,9 @@ export const COURSES: Course[] = [
     description:
       "Go from empty repo to a paid, production AI SaaS: auth, subscriptions, usage metering, and the AI feature itself.",
     priceLabel: "$149",
-    stripePriceId: env.STRIPE_PRICE_SHIP_AI_SAAS,
+    lookupKey: "pathfinder_ship_ai_saas",
+    amount: 14900,
+    currency: "usd",
     lessons: [
       { slug: "introduction", title: "Introduction & what you'll build", free: true },
       { slug: "auth-and-billing", title: "Wiring auth and Stripe subscriptions" },
@@ -41,7 +45,9 @@ export const COURSES: Course[] = [
     description:
       "Build retrieval-augmented assistants that are accurate, measurable, and safe to ship to real users.",
     priceLabel: "$129",
-    stripePriceId: env.STRIPE_PRICE_RAG_IN_PRODUCTION,
+    lookupKey: "pathfinder_rag_in_production",
+    amount: 12900,
+    currency: "usd",
     lessons: [
       { slug: "introduction", title: "Why naive RAG fails", free: true },
       { slug: "chunking-and-retrieval", title: "Chunking and retrieval that works" },

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { resolvePriceId } from "@/lib/stripe-prices";
 import { getCourse } from "@/lib/courses";
 import { hasPurchased } from "@/lib/access";
 import { env } from "@/lib/env";
@@ -25,18 +26,23 @@ export async function POST(request: Request) {
   if (!course) {
     return NextResponse.json({ error: "Unknown course." }, { status: 404 });
   }
-  if (!course.stripePriceId) {
-    return NextResponse.json(
-      { error: "This course is not configured for checkout." },
-      { status: 503 },
-    );
-  }
 
   // Don't let someone pay twice for the same lifetime-access course.
   if (await hasPurchased(session.user.id, course.id)) {
     return NextResponse.json(
       { error: "You already own this course." },
       { status: 409 },
+    );
+  }
+
+  let priceId: string;
+  try {
+    priceId = await resolvePriceId(course.lookupKey);
+  } catch (err) {
+    console.error("Failed to resolve Stripe price:", err);
+    return NextResponse.json(
+      { error: "Checkout is not configured. Run `pnpm stripe:sync`." },
+      { status: 503 },
     );
   }
 
@@ -61,7 +67,7 @@ export async function POST(request: Request) {
   const checkout = await stripe.checkout.sessions.create({
     mode: "payment",
     customer: customerId,
-    line_items: [{ price: course.stripePriceId, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${env.NEXT_PUBLIC_APP_URL}/courses/${course.id}?purchased=1`,
     cancel_url: `${env.NEXT_PUBLIC_APP_URL}/courses/${course.id}`,
     metadata: { userId: session.user.id, courseId: course.id },

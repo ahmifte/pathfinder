@@ -10,7 +10,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "stripe:sync": "tsx --env-file=.env.local scripts/stripe-sync.ts"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -35,6 +36,7 @@
     "postcss": "^8.4.39",
     "prisma": "^5.16.1",
     "tailwindcss": "^3.4.6",
+    "tsx": "^4.16.2",
     "typescript": "^5.5.3"
   }
 }

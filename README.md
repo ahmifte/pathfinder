@@ -27,9 +27,9 @@ entry plus a few MDX files.
 
 ## Adding a course
 
-1. Add an entry to [`lib/courses.ts`](lib/courses.ts) with its lessons.
+1. Add an entry to [`lib/courses.ts`](lib/courses.ts) with its lessons, `amount`, and a stable `lookupKey`.
 2. Create `content/courses/<courseId>/<lessonSlug>.mdx` for each lesson.
-3. Create a one-time Price in Stripe and set its env var.
+3. Run `pnpm stripe:sync` to provision the one-time Price in Stripe.
 
 ## Getting started
 
@@ -42,6 +42,16 @@ pnpm dev
 
 Set a Stripe webhook to `/api/stripe/webhook` and configure `STRIPE_WEBHOOK_SECRET`. All variables are documented in [`.env.example`](.env.example).
 
+### Stripe products & prices (code as source of truth)
+
+Courses define their price in code ([`lib/courses.ts`](lib/courses.ts)) via `amount` + a stable `lookupKey`. Provision them with:
+
+```bash
+pnpm stripe:sync
+```
+
+This idempotently creates/updates the Products and one-time Prices in whatever account `STRIPE_SECRET_KEY` belongs to (run it with **your** key). At runtime the app resolves the live price ID by `lookupKey` via [`lib/stripe-prices.ts`](lib/stripe-prices.ts) — no price IDs in env or code.
+
 ## Monetization
 
 One-time course sales ($99–$299) with bundle potential. Because it is
@@ -52,6 +62,7 @@ self-hosted, you keep almost everything after Stripe fees.
 - `pnpm dev` / `pnpm build` / `pnpm start`
 - `pnpm lint` / `pnpm typecheck`
 - `pnpm db:push`
+- `pnpm stripe:sync` — provision Stripe products/prices from `lib/courses.ts`
 
 ## License
 
